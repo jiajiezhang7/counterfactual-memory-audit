@@ -161,19 +161,29 @@ body {
 :root {
   --ink: #1c1917;
   --muted: #57534e;
+  --quiet: #8a847c;
   --line: rgba(28, 25, 23, 0.1);
   --paper: #f6f4f1;
   --card: #fffcf8;
   --accent: #1e4d5c;
   --accent-soft: #e6eef1;
+  --sans: "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  --serif: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
+body,
+.button,
+.navbar,
+.switcher button {
+  font-family: var(--sans);
+}
+
 body {
-  font-family: "Noto Sans", "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--ink);
   background: var(--paper);
 }
@@ -205,6 +215,13 @@ button:focus-visible {
   color: var(--accent) !important;
 }
 
+.cma-nav .navbar-item {
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
+}
+
 @media screen and (min-width: 1024px) {
   .cma-nav .navbar-start {
     flex-grow: 1;
@@ -224,6 +241,73 @@ button:focus-visible {
   padding-right: 1.25rem;
 }
 
+.cma-outline {
+  display: none;
+}
+
+.cma-outline-label {
+  margin: 0 0 0.35rem;
+  color: var(--quiet);
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cma-outline nav {
+  display: grid;
+}
+
+.cma-outline a {
+  display: block;
+  padding: 0.34rem 0;
+  color: rgba(28, 25, 23, 0.55);
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.cma-outline a[data-level="2"] {
+  padding-left: 0.7rem;
+  color: rgba(28, 25, 23, 0.42);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.cma-outline a[aria-current="true"] {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+@media screen and (min-width: 1180px) {
+  .cma-shell {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1080px);
+    column-gap: 1.5rem;
+    justify-content: center;
+    align-items: start;
+    padding-left: 1.15rem;
+    padding-right: 1.75rem;
+  }
+
+  .cma-outline {
+    display: block;
+    position: sticky;
+    top: 5.25rem;
+    align-self: start;
+    padding-left: 0.85rem;
+    border-left: 1px solid rgba(28, 25, 23, 0.16);
+  }
+
+  .cma-main .cma-wrap {
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
 .cma-section {
   padding-top: 4.25rem;
   padding-bottom: 4.25rem;
@@ -235,43 +319,58 @@ section[id],
 }
 
 .cma-kicker {
-  margin-bottom: 0.85rem;
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
+  margin-bottom: 0.7rem;
+  color: var(--quiet);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
-.publication-title {
-  font-family: "Noto Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+.hero .hero-body {
+  padding-top: 2.35rem;
+  padding-bottom: 2.5rem;
+}
+
+.title.publication-title {
+  font-family: var(--sans);
   font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.12;
-  font-size: clamp(1.85rem, 4vw, 3.15rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  font-size: clamp(2.2rem, 5vw, 4.15rem);
   color: var(--ink);
+  margin-bottom: 0.35rem;
 }
 
 .title-rest {
   display: block;
-  margin-top: 0.55rem;
-  font-size: 0.58em;
+  margin-top: 0.72rem;
+  font-size: clamp(1.15rem, 1.9vw, 1.6rem);
   font-weight: 500;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-  color: #292524;
+  line-height: 1.28;
+  letter-spacing: -0.022em;
+  color: #44403c;
 }
 
 .publication-authors {
-  margin-top: 1.35rem;
-  font-family: "Noto Sans", "Segoe UI", Helvetica, Arial, sans-serif;
-  line-height: 1.35;
+  margin-top: 0.95rem;
+  font-family: var(--sans);
+  font-size: 1.02rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .author-block {
   display: inline-block;
-  margin: 0.45rem 0.85rem;
+  margin: 0.15rem 0.7rem 0;
   vertical-align: top;
+}
+
+.publication-meta {
+  margin-top: 0.55rem;
+  font-family: var(--sans);
+  font-weight: 400;
 }
 
 .publication-authors a {
@@ -280,34 +379,40 @@ section[id],
 
 .author-email {
   display: block;
-  margin-top: 0.15rem;
-  font-size: 0.82rem !important;
+  margin-top: 0.12rem;
+  font-family: var(--sans);
+  font-size: 0.75rem !important;
   font-weight: 400 !important;
+  letter-spacing: 0;
   color: var(--muted) !important;
 }
 
 .affiliation-line,
 .contrib-note {
   color: #44403c;
+  font-family: var(--sans);
 }
 
 .affiliation-line {
-  margin-top: 0.35rem;
+  margin-top: 0.1rem;
+  font-size: 0.92rem;
+  font-weight: 400;
 }
 
 .contrib-note {
-  margin-top: 0.35rem;
-  color: var(--muted);
-  font-size: 0.95rem;
+  margin-top: 0.15rem;
+  color: var(--quiet);
+  font-size: 0.82rem;
 }
 
 .claim {
-  max-width: 46rem;
-  margin: 1.35rem auto 0;
-  color: #44403c;
-  font-family: Castoro, Georgia, "Times New Roman", serif;
-  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  max-width: 40rem;
+  margin: 1.15rem auto 0;
+  color: #292524;
+  font-family: var(--serif);
+  font-size: clamp(1.22rem, 1.7vw, 1.42rem);
   font-style: italic;
+  font-weight: 400;
   line-height: 1.45;
 }
 
@@ -340,24 +445,45 @@ section[id],
   opacity: 1;
 }
 
-.cma-h2 {
-  font-size: clamp(1.65rem, 2.4vw, 2.05rem);
-  letter-spacing: -0.02em;
-  margin-bottom: 1rem;
+.title.cma-h2 {
+  font-family: var(--sans);
+  font-size: clamp(2rem, 2.8vw, 2.55rem);
+  font-weight: 600;
+  letter-spacing: -0.032em;
+  line-height: 1.12;
+  margin-bottom: 0.85rem;
+}
+
+.cma-lead,
+.abstract p,
+#method .cma-wrap > p,
+#experiments .cma-wrap > p,
+.figure-block figcaption,
+.still-grid figcaption,
+.clip-caption,
+.video-note,
+.teaser-caption,
+.finding-card p:last-child,
+.audit-steps p,
+.subjects-note,
+.bibtex-note {
+  font-family: var(--serif);
 }
 
 .cma-lead {
-  max-width: 46rem;
-  color: #44403c;
-  font-size: 1.05rem;
-  line-height: 1.6;
+  max-width: 42rem;
+  color: #292524;
+  font-size: 1.2rem;
+  line-height: 1.55;
 }
 
 #method .cma-wrap > p,
 #experiments .cma-wrap > p {
-  max-width: 48rem;
+  max-width: 42rem;
   margin-bottom: 0.95rem;
-  line-height: 1.65;
+  color: #292524;
+  font-size: 1.175rem;
+  line-height: 1.62;
 }
 
 .teaser {
@@ -372,25 +498,25 @@ section[id],
 }
 
 .teaser-caption {
-  max-width: 46rem;
-  margin: 0.9rem auto 0;
-  color: var(--muted);
-  font-family: Castoro, Georgia, "Times New Roman", serif;
-  font-size: 1.05rem;
-  line-height: 1.45;
+  max-width: 40rem;
+  margin: 0.95rem auto 0;
+  color: #44403c;
+  font-size: 1.12rem;
+  line-height: 1.5;
 }
 
 .abstract {
-  max-width: 44rem;
+  max-width: 40rem;
   margin: 0 auto 3.5rem;
 }
 
 .abstract p {
-  margin-bottom: 1rem;
+  margin-bottom: 1.05rem;
   text-align: justify;
   hyphens: auto;
-  line-height: 1.7;
-  font-size: 1.05rem;
+  line-height: 1.62;
+  font-size: 1.2rem;
+  color: #292524;
 }
 
 .cma-player {
@@ -410,9 +536,10 @@ section[id],
 }
 
 .video-note {
-  margin-top: 0.75rem;
+  margin-top: 0.8rem;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
 }
 
 .audit-steps {
@@ -448,7 +575,7 @@ section[id],
 .audit-steps p {
   margin: 0;
   color: #44403c;
-  font-size: 0.92rem;
+  font-size: 1rem;
   line-height: 1.45;
 }
 
@@ -457,14 +584,19 @@ section[id],
 }
 
 .method-block h3 {
-  margin-bottom: 0.45rem;
-  font-size: 1.25rem;
-  letter-spacing: -0.015em;
+  margin-bottom: 0.4rem;
+  font-family: var(--sans);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.022em;
 }
 
 .method-block p {
-  max-width: 48rem;
-  line-height: 1.65;
+  max-width: 42rem;
+  color: #292524;
+  font-family: var(--serif);
+  font-size: 1.175rem;
+  line-height: 1.62;
 }
 
 .figure-block {
@@ -482,10 +614,9 @@ section[id],
 
 .figure-block figcaption {
   margin-top: 0.7rem;
-  color: var(--muted);
-  font-family: Castoro, Georgia, "Times New Roman", serif;
-  font-size: 0.98rem;
-  line-height: 1.45;
+  color: #44403c;
+  font-size: 1.05rem;
+  line-height: 1.5;
 }
 
 .switcher {
@@ -532,11 +663,10 @@ section[id],
 
 .clip-caption {
   min-height: 4.8rem;
-  margin-top: 0.85rem;
-  color: #44403c;
-  font-family: Castoro, Georgia, "Times New Roman", serif;
-  font-size: 1.05rem;
-  line-height: 1.45;
+  margin-top: 0.9rem;
+  color: #292524;
+  font-size: 1.12rem;
+  line-height: 1.5;
 }
 
 .still-grid {
@@ -568,9 +698,9 @@ section[id],
 .still-grid figcaption {
   margin: 0;
   padding: 0.75rem 0.95rem 0.95rem;
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.4;
+  color: #44403c;
+  font-size: 1.02rem;
+  line-height: 1.45;
 }
 
 #findings {
@@ -594,17 +724,19 @@ section[id],
 }
 
 .finding-kicker {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.4rem;
   color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .finding-card p:last-child {
   margin-bottom: 0;
-  line-height: 1.55;
+  font-size: 1.08rem;
+  line-height: 1.5;
 }
 
 .subjects-note {
@@ -632,9 +764,9 @@ section[id],
 .bibtex-wrap code {
   color: inherit;
   background: transparent;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.92rem;
-  line-height: 1.55;
+  font-family: var(--mono);
+  font-size: 0.84rem;
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
