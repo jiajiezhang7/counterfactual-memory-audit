@@ -13,7 +13,7 @@
   <meta property="og:url" content="https://jiajiezhang7.github.io/counterfactual-memory-audit/">
   <meta property="og:image" content="https://jiajiezhang7.github.io/counterfactual-memory-audit/static/images/fig1_cma_design.png">
   <link rel="icon" href="./static/images/favicon.svg">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400;1,500&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400;1,8..60,500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="./static/css/index.css">
   <script defer src="./static/js/fontawesome.all.min.js"></script>
@@ -31,10 +31,7 @@
   </div>
   <div id="navMenu" class="navbar-menu">
     <div class="navbar-start">
-      <a class="navbar-item" href="https://jiajiezhang7.github.io/">
-        <span class="icon"><i class="fas fa-home"></i></span>
-        <span>Home</span>
-      </a>
+      <a class="navbar-item" href="https://jiajiezhang7.github.io/">Home</a>
       <a class="navbar-item" href="#abstract">Abstract</a>
       <a class="navbar-item" href="#video">Video</a>
       <a class="navbar-item" href="#method">Method</a>
@@ -47,8 +44,8 @@
 
 <div class="cma-shell">
 <aside class="cma-outline" aria-label="On this page">
-  <p class="cma-outline-label">On this page</p>
   <nav>
+    <a href="#top">Title</a>
     <a href="#abstract">Abstract</a>
     <a href="#video" data-level="2">Video</a>
     <a href="#method">Method</a>
@@ -62,7 +59,7 @@
 <header class="hero">
   <div class="hero-body">
     <div class="cma-wrap">
-      <div class="has-text-centered">
+      <div class="cma-titleblock">
         <p class="cma-kicker">Counterfactual Memory Audit · ICRA 2027 submission</p>
         <h1 class="title publication-title">
           Memory That Changes Action Is Not Memory That Guides It<span class="title-colon">:</span>
@@ -96,24 +93,24 @@
 
         <div class="publication-links">
           <span class="link-block">
-            <a class="button is-normal is-rounded is-dark" href="https://arxiv.org/abs/2609.27247" target="_blank" rel="noopener noreferrer">
+            <a class="cma-btn" href="https://arxiv.org/abs/2609.27247" target="_blank" rel="noopener noreferrer">
               <span>arXiv</span>
             </a>
           </span>
           <span class="link-block">
-            <a class="button is-normal is-rounded is-dark" href="https://arxiv.org/pdf/2609.27247" target="_blank" rel="noopener noreferrer">
+            <a class="cma-btn" href="https://arxiv.org/pdf/2609.27247" target="_blank" rel="noopener noreferrer">
               <span class="icon"><i class="fas fa-file-pdf"></i></span>
               <span>PDF</span>
             </a>
           </span>
           <span class="link-block">
-            <a class="button is-normal is-rounded is-dark" href="#video">
+            <a class="cma-btn" href="#video">
               <span class="icon"><i class="fas fa-video"></i></span>
               <span>Video</span>
             </a>
           </span>
           <span class="link-block">
-            <button class="button is-normal is-rounded is-placeholder" type="button" disabled title="Code is not public yet">
+            <button class="cma-btn cma-btn--quiet" type="button" disabled title="Code is not public yet">
               <span class="icon"><i class="fab fa-github"></i></span>
               <span>Code (coming soon)</span>
             </button>
@@ -127,27 +124,23 @@
 <section class="hero teaser">
   <div class="cma-wrap">
     <div class="hero-body">
-      <img src="./static/images/fig1_cma_design.png" alt="CMA design. Two lawful histories update native memories. One frozen policy is queried on a shared present. Saved actions are scored in evaluator-only worlds.">
-      <p class="teaser-caption has-text-centered">Two lawful pasts, one identical present: each history updates a native memory before the frozen policy is queried.</p>
+      <img src="./static/images/fig1_cma_design.png" width="3150" height="1080" alt="CMA design. Two lawful histories update native memories. One frozen policy is queried on a shared present. Saved actions are scored in evaluator-only worlds.">
+      <p class="teaser-caption">Two lawful pasts, one identical present: each history updates a native memory before the frozen policy is queried.</p>
     </div>
   </div>
 </section>
 
 <section class="cma-section" id="abstract">
   <div class="cma-wrap">
-    <h2 class="title cma-h2 has-text-centered">Abstract</h2>
+    <h2 class="title cma-h2">Abstract</h2>
     <div class="abstract">
-      <p>A robot returning a block to its origin tray may encounter two task-consistent pasts that reconverge to the same current input but warrant different actions. Yet memory-policy evaluations often rely on task success or action change under memory perturbation, neither of which establishes that memory guides the decision.</p>
-      <p>We propose the Counterfactual Memory Audit (CMA), an evaluation protocol that crosses two histories at a verified-identical present, queries a frozen policy under common randomness, and evaluates each saved action under both pasts. This separates memory sensitivity, warranted choice, matched-world physical value, and per-pair reliability.</p>
-      <p>On Mem-0, every audited Put Back pair changes action, but only 20/64 pairs are fully reliable; at a later Swap decision, all paired actions change while both memories select the same branch.</p>
-      <p>Native interventions further show closed-loop influence: replacing the history bank redirects behavior toward the replaced content, while restoring a 4096-byte protected anchor recovers 38.9 points of Swap success lost to injected bank faults. On a dual-arm physical platform, memory changes saved actions, yet five of nine completed Put Back manipulations reach the wrong target.</p>
-      <p>These results show that a robot can remember and react without reliably using memory to choose the behavior its past warrants. CMA provides a decision-level audit for distinguishing these cases.</p>
+      <p>A robot returning a block to its origin tray may encounter two task-consistent pasts that reconverge to the same current input but warrant different actions. Yet memory-policy evaluations often rely on task success or action change under memory perturbation, neither of which establishes that memory guides the decision. We propose the Counterfactual Memory Audit (CMA), an evaluation protocol that crosses two histories at a verified-identical present, queries a frozen policy under common randomness, and evaluates each saved action under both pasts. This separates memory sensitivity, warranted choice, matched-world physical value, and per-pair reliability. On Mem-0, every audited Put Back pair changes action, but only 20/64 pairs are fully reliable; at a later Swap decision, all paired actions change while both memories select the same branch. Native interventions further show closed-loop influence: replacing the history bank redirects behavior toward the replaced content, while restoring a 4096-byte protected anchor recovers 38.9 points of Swap success lost to injected bank faults. On a dual-arm physical platform, memory changes saved actions, yet five of nine completed Put Back manipulations reach the wrong target. These results show that a robot can remember and react without reliably using memory to choose the behavior its past warrants. CMA provides a decision-level audit for distinguishing these cases.</p>
     </div>
 
     <div id="video">
-      <h2 class="title cma-h2 has-text-centered">Video</h2>
-      <p class="cma-lead" style="margin-left:auto;margin-right:auto;text-align:center;">Full submission video. Playback stays in the browser and does not start on its own.</p>
-      <div class="cma-player" style="margin-top:1.25rem;">
+      <h2 class="title cma-h2">Video</h2>
+      <p class="cma-lead">Full submission video. Playback stays in the browser and does not start on its own.</p>
+      <div class="cma-player">
         <video id="submission-video" controls playsinline preload="metadata" poster="./static/images/poster_submission.jpg" width="1280" height="720" aria-label="CMA submission video">
           <source src="./static/videos/cma_submission_v6.mp4" type="video/mp4">
           <a href="./static/videos/cma_submission_v6.mp4">Download the submission video</a>
@@ -157,7 +150,7 @@
   </div>
 </section>
 
-<section class="cma-section" id="method" style="background:#fffcf8;border-top:1px solid rgba(28,25,23,0.1);border-bottom:1px solid rgba(28,25,23,0.1);">
+<section class="cma-section" id="method">
   <div class="cma-wrap">
     <h2 class="title cma-h2">Method</h2>
     <p>CMA holds fixed everything the policy can see and changes only what it remembers. Two task-consistent histories, generated by the task’s own motion primitives, warrant different branches. Each history updates its native memory. Both then reconverge to one current packet whose non-memory inputs have been verified identical.</p>
@@ -200,7 +193,7 @@
       <p>Panel A builds two lawful histories and their native memories. Panel B queries one frozen policy once per memory on the shared present. Panel C scores the saved actions only after they cross into evaluator worlds.</p>
       <figure class="figure-block">
         <a href="./static/images/fig1_cma_design.png">
-          <img src="./static/images/fig1_cma_design.png" alt="Figure 1. Lawful histories update native memories, one policy is queried twice on the same present, and four evaluator scores stay outside the policy." loading="lazy">
+          <img src="./static/images/fig1_cma_design.png" width="3150" height="1080" alt="Figure 1. Lawful histories update native memories, one policy is queried twice on the same present, and four evaluator scores stay outside the policy." loading="lazy">
         </a>
         <figcaption>Figure 1. Two lawful histories, one verified present, and an evaluator-only crossing. The warranted branch is not in the current observation.</figcaption>
       </figure>
@@ -211,7 +204,7 @@
       <p>Sensitivity, choice, physical value, and pair reliability need not agree. On Mem-0 Put Back, every audited pair changes action, but only 20/64 pairs are fully reliable. At a later Swap decision, all paired actions change while both memories select the same branch.</p>
       <figure class="figure-block">
         <a href="./static/images/fig2_incremental_value.png">
-          <img src="./static/images/fig2_incremental_value.png" alt="Figure 2. Put Back pairs at the same correct-choice rate differ in crossed utility. Twenty of 64 pairs are fully reliable. A later Swap pair changes action without changing branch." loading="lazy">
+          <img src="./static/images/fig2_incremental_value.png" width="3150" height="1259" alt="Figure 2. Put Back pairs at the same correct-choice rate differ in crossed utility. Twenty of 64 pairs are fully reliable. A later Swap pair changes action without changing branch." loading="lazy">
         </a>
         <figcaption>Figure 2. Choice, crossed utility, and pair reliability on the same saved actions. The Swap panel is one illustrative pair; the branch result is the cohort’s.</figcaption>
       </figure>
@@ -222,13 +215,13 @@
       <p>An outcome-blind detector asks whether the audited decision structure appears in untreated episodes. A separate control crosses semantic origin with two detour routes that restore the same current. Nuisance effects are judged by equivalence to preregistered margins, not by a failure to find a difference.</p>
       <figure class="figure-block">
         <a href="./static/images/fig3_natural_bridge.png">
-          <img src="./static/images/fig3_natural_bridge.png" alt="Figure 3. Natural-rollout gate and observational downstream contrasts. The primary remaining-step contrast is marked unresolved." loading="lazy">
+          <img src="./static/images/fig3_natural_bridge.png" width="3150" height="1188" alt="Figure 3. Natural-rollout gate and observational downstream contrasts. The primary remaining-step contrast is marked unresolved." loading="lazy">
         </a>
         <figcaption>Figure 3. Untreated natural rollouts. Reached episodes are labeled correct, ambiguous, or violating. The primary remaining-step contrast is unresolved; the final-success contrast is observational.</figcaption>
       </figure>
       <figure class="figure-block">
         <a href="./static/images/fig4_nuisance_equivalence.png">
-          <img src="./static/images/fig4_nuisance_equivalence.png" alt="Figure 4. Semantic origins crossed with two nuisance detours, and equivalence intervals inside frozen margins." loading="lazy">
+          <img src="./static/images/fig4_nuisance_equivalence.png" width="1530" height="1204" alt="Figure 4. Semantic origins crossed with two nuisance detours, and equivalence intervals inside frozen margins." loading="lazy">
         </a>
         <figcaption>Figure 4. Irrelevant-history control. Each semantic origin is paired with two detours that share the restored current. The equivalence claim is limited to those routes.</figcaption>
       </figure>
@@ -290,11 +283,11 @@
 
     <div class="still-grid">
       <figure>
-        <img src="./static/images/PutBack.jpg" alt="Overhead view of the dual-arm cell at a Put Back decision. A blue block sits at the center seat and the side trays are empty." loading="lazy">
-        <figcaption>Put Back. The restored scene hides the origin tray, so the warranted return depends on the manipulation history.</figcaption>
+        <img src="./static/images/PutBack.jpg" width="1707" height="1280" alt="Overhead view of the dual-arm cell at Put Back initial state. A blue block sits in a side tray before the histories diverge." loading="lazy">
+        <figcaption>Put Back. Task initial state: the blue block starts in a side tray; the warranted return is not yet fixed by history.</figcaption>
       </figure>
       <figure>
-        <img src="./static/images/Repick.jpg" alt="Dual-arm cell during Repick. A person holds an orange block above the trays." loading="lazy">
+        <img src="./static/images/Repick.jpg" width="1707" height="1280" alt="Dual-arm cell during Repick. A person holds an orange block above the trays." loading="lazy">
         <figcaption>Repick. An external lift determines which object should be selected after both objects are back in their trays.</figcaption>
       </figure>
     </div>
@@ -330,8 +323,8 @@
 <section class="cma-section" id="bibtex">
   <div class="cma-wrap">
     <div class="bibtex-head">
-      <h2 class="title cma-h2" style="margin-bottom:0;">BibTeX</h2>
-      <button class="button is-small is-rounded is-dark" type="button" id="copy-bibtex">Copy</button>
+      <h2 class="title cma-h2">BibTeX</h2>
+      <button class="cma-btn cma-btn--small" type="button" id="copy-bibtex">Copy</button>
     </div>
     <div class="bibtex-wrap">
       <pre><code id="bibtex">@article{zhang2026cma,
