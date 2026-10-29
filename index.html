@@ -134,11 +134,7 @@
   <div class="cma-wrap">
     <h2 class="title cma-h2">Abstract</h2>
     <div class="abstract">
-      <p>A robot returning a block to its origin tray may encounter two task-consistent pasts that reconverge to the same current input but warrant different actions. Yet memory-policy evaluations often rely on task success or action change under memory perturbation, neither of which establishes that memory guides the decision.</p>
-      <p>We propose the Counterfactual Memory Audit (CMA), an evaluation protocol that crosses two histories at a verified-identical present, queries a frozen policy under common randomness, and evaluates each saved action under both pasts. This separates memory sensitivity, warranted choice, matched-world physical value, and per-pair reliability.</p>
-      <p>On Mem-0, every audited Put Back pair changes action, but only 20/64 pairs are fully reliable; at a later Swap decision, all paired actions change while both memories select the same branch.</p>
-      <p>Native interventions further show closed-loop influence: replacing the history bank redirects behavior toward the replaced content, while restoring a 4096-byte protected anchor recovers 38.9 points of Swap success lost to injected bank faults. On a dual-arm physical platform, memory changes saved actions, yet five of nine completed Put Back manipulations reach the wrong target.</p>
-      <p>These results show that a robot can remember and react without reliably using memory to choose the behavior its past warrants. CMA provides a decision-level audit for distinguishing these cases.</p>
+      <p>A robot returning a block to its origin tray may encounter two task-consistent pasts that reconverge to the same current input but warrant different actions. Yet memory-policy evaluations often rely on task success or action change under memory perturbation, neither of which establishes that memory guides the decision. We propose the Counterfactual Memory Audit (CMA), an evaluation protocol that crosses two histories at a verified-identical present, queries a frozen policy under common randomness, and evaluates each saved action under both pasts. This separates memory sensitivity, warranted choice, matched-world physical value, and per-pair reliability. On Mem-0, every audited Put Back pair changes action, but only 20/64 pairs are fully reliable; at a later Swap decision, all paired actions change while both memories select the same branch. Native interventions further show closed-loop influence: replacing the history bank redirects behavior toward the replaced content, while restoring a 4096-byte protected anchor recovers 38.9 points of Swap success lost to injected bank faults. On a dual-arm physical platform, memory changes saved actions, yet five of nine completed Put Back manipulations reach the wrong target. These results show that a robot can remember and react without reliably using memory to choose the behavior its past warrants. CMA provides a decision-level audit for distinguishing these cases.</p>
     </div>
 
     <div id="video">
@@ -287,7 +283,7 @@
 
     <div class="still-grid">
       <figure>
-        <img src="./static/images/PutBack.jpg" width="1280" height="1707" alt="Overhead view of the dual-arm cell at a Put Back decision. A blue block sits at the center seat and the side trays are empty." loading="lazy">
+        <img src="./static/images/PutBack.jpg" width="1280" height="960" alt="Overhead view of the dual-arm cell at a Put Back decision. A blue block sits at the center seat and the side trays are empty." loading="lazy">
         <figcaption>Put Back. The restored scene hides the origin tray, so the warranted return depends on the manipulation history.</figcaption>
       </figure>
       <figure>

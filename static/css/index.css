@@ -829,7 +829,7 @@ section[id],
 
 .still-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.35rem 1.6rem;
   margin-top: 1.85rem;
   align-items: start;
