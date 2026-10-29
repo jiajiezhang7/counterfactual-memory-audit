@@ -1,0 +1,556 @@
+             Memory That Changes Action Is Not Memory That Guides It:
+             Counterfactual Auditing of History-Conditioned Robot Policies
+                                      Jiajie Zhang1,† , Yankai Xiang2,† , and Changhao Chen1,∗
+
+
+   Abstract— A robot returning a block to its origin tray may                           Two lawful pasts, one identical present
+encounter two task-consistent pasts that reconverge to the same
+current input but warrant different actions. Yet memory-policy
+evaluations often rely on task success or action change under               0                              native
+                                                                                                            update         1
+memory perturbation, neither of which establishes that memory
+guides the decision. We propose the Counterfactual Memory Au-
+dit (CMA), an evaluation protocol that crosses two histories at a                 origin mat 0                                  origin mat 1
+verified-identical present, queries a frozen policy under common
+randomness, and evaluates each saved action under both pasts.                                                              warranted branch
+This separates memory sensitivity, warranted choice, matched-                                                              0 : mat 0
+world physical value, and per-pair reliability. On Mem-0, every                                                            1 : mat 1
+audited Put Back pair changes action, but only 20/64 pairs are
+fully reliable; at a later Swap decision, all paired actions change                                    identical present
+while both memories select the same branch. Native interventions
+further show closed-loop influence: replacing the history bank            Fig. 1. The audited decision: two lawful pasts, one identical present.
+redirects behavior toward the replaced content, while restoring a         Frames from one frozen Put Back pair (illustrative). Each task-consistent
+                                                                          history (H0 , H1 ) updates its native memory (M0 , M1 ) before reconverging
+4096-byte protected anchor recovers 38.9 points of Swap success
+                                                                          to the same present. Stacked outlines denote the stored multi-frame executed
+lost to injected bank faults. On a dual-arm physical platform,            history. Solid rings mark each history’s origin mat; dashed rings mark the
+memory changes saved actions, yet five of nine completed Put              same mats at the present, both empty, making the warranted branch invisible
+Back manipulations reach the wrong target. These results show             from the current observation alone.
+that a robot can remember and react without reliably using
+memory to choose the behavior its past warrants. CMA provides             memory should matter. A frozen policy may nevertheless
+a decision-level audit for distinguishing these cases.
+                                                                          complete the task reliably. The central question remains
+                         I. I NTRODUCTION                                 unanswered: at this particular decision, did the remembered
+    Robot manipulation is acquiring memory. Recent robot                  content cause the policy to choose the branch it warranted?
+learning policies retain information in many forms, from                     Existing evaluation protocols answer related but narrower
+recurrent states to retrieval banks and episodic stores [1]–[6],          questions. Episode success measures overall competence, yet
+while a growing set of benchmarks evaluates them under                    a policy may recover from an incorrect local decision through
+delayed evidence, long horizons, and memory interference                  subsequent replanning; success therefore certifies the outcome,
+[7]–[11]. Yet these evaluations ultimately reduce memory use              not the decision. Retrieval and probing accuracy establish
+to task-level outcomes. This invites a tempting inference: if             that historical information is accessible or decodable, but
+adding memory improves the score, the policy must be using                accessibility does not imply task-relevant use [13]. Memory
+that memory. But such evidence never examines whether                     ablations reveal aggregate dependence across episodes, but
+memory determines an individual decision.                                 do not identify the direction of an individual decision. Action
+    Consider what a task-level score cannot reveal. A robot               distance detects behavioral change, but an action may change
+picks up a block from one of two trays and must later return              without changing the underlying task branch. None of these
+it to its original tray. At the return decision, two lawful pasts,        metrics directly establishes whether memory caused the
+generated entirely by the task’s own motion primitives, can               warranted decision at a fixed present.
+reconverge to the same image, proprioception, and instruction,               To address this gap, we propose the Counterfactual
+with both candidate trays now empty (Fig. 1). The correct                 Memory Audit (CMA), an evaluation protocol that makes
+branch is therefore absent from the current input; only memory            this question measurable for a frozen robot policy (Fig. 2). We
+distinguishes the pasts that warrant different actions. This              construct two task-consistent histories, update their respective
+is a concrete instance of perceptual aliasing in a partially              native memories, and then reconverge to a verified-identical
+observable control problem [12], precisely the setting in which           current input. The policy is queried once per memory under
+                                                                          common randomness, and each resulting action is evaluated
+  1 Jiajie Zhang and Changhao Chen are with the Hong Kong University of
+Science and Technology (Guangzhou), Guangzhou, China
+                                                                          in both evaluator-only worlds, which are never exposed to the
+jiajiezhang@hkust-gz.edu.cn,                                              policy. This design yields a four-level audit, with each level
+changhaochen@hkust-gz.edu.cn                                              asking a stricter question. First, sensitivity: does changing
+  2 Yankai Xiang is with ShanghaiTech University, Shanghai, China
+                                                                          memory change the action? Second, choice: does the change
+xiangyk2025@shanghaitech.edu.cn
+  † These authors contributed equally to this work.                       favor the branch encoded by the memory? Third, matched-
+  ∗ Corresponding author.                                                 world value: when memory matches the underlying world,
+does the selected action improve continuous physical value?            at a fixed present, and both supply CMA’s subjects: the frozen
+Finally, reliability: does this effect hold across every pair,         checkpoints (Mem-0 from RMBench [9], BridgeVLA++ [6])
+both crossing directions, and every registered action seed?            and the tasks under audit.
+These are distinct verdicts: sensitivity does not imply correct
+choice, correct choice does not imply physical value, and              B. Counterfactual Tests of Memory Use
+average value does not imply reliable memory use.                         A small family of evaluations intervenes directly on what
+   Applied to frozen checkpoints, the audit dissociates the two        a policy has stored. LIBERO-CF tests a complementary
+standard behavioral signals: one task is correct on average            counterfactual generalization question [14]; TRACE perturbs
+yet unreliable pair by pair, while another changes every               the executed routing path and reads out route and branch
+action without ever changing the selected branch. A dual-arm           consistency [15]; TFP replaces hidden memory at a fixed
+physical platform reproduces the same dissociation. At the             current input but stops at action variation, the first rung of
+same time, memory can exert closed-loop influence: replacing           the audit [16]. The closest work, Chameleon, keeps, swaps,
+the history bank redirects every continuation toward the               or removes stored traces and reports counterfactual choice
+replaced content, while restoring a single 4096-byte protected         accuracy, covering the audit’s first two questions [17]. None
+component recovers 38.9 points of success lost to injected             replaces complete lawful native histories, verifies an exactly
+bank faults. These results motivate evaluating memory beyond           equal current packet, and scores the same saved actions under
+episode-level outcomes and suggest a design principle for              both evaluator worlds; CMA adds crossed physical value
+future systems: when memory is implemented as a declared,              and per-pair bidirectional reliability, closing two real gaps: a
+protectable component, its decision-level influence can be             discrete choice can hide different world value, and a positive
+audited, and its critical content selectively restored after faults.   average can hide pairs failing one direction or one seed.
+   Our contributions are:
+                                                                       C. Causal Attribution and Memory Intervention
+   • We propose the Counterfactual Memory Audit (CMA),
+                                                                          Causal misidentification and shortcut copying show that
+     an evaluation protocol for history-conditioned manipula-
+                                                                       history can mislead as well as inform [18]–[20]; those works
+     tion policies that crosses two task-consistent histories at
+                                                                       motivate training-time remedies, whereas CMA diagnoses a
+     a verified-identical present and evaluates the resulting
+                                                                       frozen policy. Probing separates decodability from use [13],
+     decision with four decision-level metrics absent from
+                                                                       and interchange interventions and activation patching ask re-
+     episode-level benchmark scores.
+                                                                       lated causal questions at the representation level [21], [22]; in
+   • We show that task success and action change alone
+                                                                       frozen VLAs they find stored history causally deployed mainly
+     are insufficient evidence of memory use, while audited
+                                                                       under degraded current frames [23], whereas CMA audits the
+     memory can exert closed-loop influence: replacing
+                                                                       complementary regime, an intact present that cannot supply
+     memory redirects the robot toward the replaced content,
+                                                                       the branch, and reads out closed-loop behavior rather than
+     and restoring a small protected component recovers
+                                                                       internal representation. Repeated-measure unit errors motivate
+     success lost under injected memory-bank faults.
+                                                                       CMA’s pair-cluster inference and common randomness [24].
+   • We apply the audit to two separately analyzed frozen
+                                                                       Online detection and scheduling around memory [25]–[27]
+     manipulation policies across tasks, decision phases,
+                                                                       and counterfactual attribution with rollback repair for text-
+     and four intervention classes, and reproduce the same
+                                                                       agent memories [28], [29] build deployment mechanisms; we
+     crossing protocol on a dual-arm physical platform with
+                                                                       train no detector and test no adaptive timing, instead restoring
+     measured resets.
+                                                                       one declared tensor of a robot policy’s memory carrier at a
+                      II. R ELATED W ORK                               fixed boundary and reading out physical task success.
+
+A. Memory Policies and Benchmarks                                               III. C OUNTERFACTUAL M EMORY AUDIT
+   Manipulation policies increasingly carry explicit memory,           A. Audit Protocol
+and its form varies widely: recurrent states and recurrent                Our proposed CMA protocol holds fixed everything the
+queries that summarize history inside the network [1], [2],            policy can see and changes only what it remembers. Through-
+adaptive working-memory recoding against state ambigu-                 out, light italic denotes scalars (S, F , U , L, and all indices),
+ity [3], retrieval over stored experience [4], and memory-             bold capitals denote matrices, and calligraphic capitals denote
+augmented VLA frameworks with episodic or multi-scale                  structured objects that are neither: histories, memory states,
+stores [5], [6]. A parallel line of benchmarks asks whether            input packets, and evaluator worlds. Two task-consistent his-
+such memory helps: MemoryBench scores spatial recall [7],              tories, H0 and H1 , are generated entirely by the task’s motion
+MIKASA organizes memory-intensive RL tasks [8], and RM-                primitives and warrant semantic branches 0 and 1, respectively.
+Bench, RoboMME, and RoboMemArena score manipulation                    Their native updates produce memory states M0 and M1 ,
+policies episode by episode under delayed evidence, long               after which both histories reconverge to a verified-identical
+horizons, and memory interference [9]–[11]. All of these               current packet Xt at the audited present t. The packet contains
+certify memory at the episode level: a policy is credited              every non-memory input available to the policy, including raw
+when it finishes tasks designed to require history. Neither line       and encoded images, proprioception, instruction, action tail,
+identifies whether remembered content governed one action              controller state, and clocks. The underlying physical state is
+     A     Two lawful pasts                      B     One present, two queries                                  C    Evaluator-only crossing
+             0
+
+
+                                                                                                evaluator-only
+                                                                                                                            Frozen actions
+                           native
+                           update                                                                                          A0            A1
+                                    0
+                                                                                                                 0      V0 (A0 )      V0 (A1 )      within-pair
+                                                                                         A0                                                          aggregate
+              1              reconverge to                             one frozen
+                                                                                                                 1
+                            the same present                             policy π                                        V1 (A0 )      V1 (A1 )     pair-cluster
+                                                                                         A1                                                          inference
+                                    1                                                                           diagonal fill = matching relation only
+                           native                shared current t
+                           update              verified exactly equal                                                  never enters the policy
+
+
+
+Fig. 2. CMA crosses lawful memories at one fixed present. (A) Two lawful histories from one illustrative later-Swap pair differ only in which mats
+hold a block and update two native memories (stacked outlines: stored history). (B) Both queries receive the verified-exactly-equal shared current Xt ; the
+frozen policy is queried once per memory under common randomness. (C) The saved actions cross the evaluator-only boundary (dashed) and are scored in
+both worlds, which never enter the policy; the four scores aggregate within pair before pair-cluster inference.
+
+controlled and verified to be equal across the two queries but                   write Sexec for S under this distance. Sensitivity is unsigned:
+is never exposed to the policy. We keep three entities separate                  two actions may differ while approaching the same tray,
+by construction: a memory state M contains only the native                       choosing neither branch, or following the same branch.
+history carrier; an action chunk A ∈ RK×da stacks the K                             A preregistered oracle is a scalar-valued map Yw on action
+serialized da -dimensional actions returned by one query, a                      chunks, Yw (A) ∈ {−1, 0, +1}: +1 when A selects the
+single-action query being the case K = 1; and the evaluator                      branch warranted in Ww , −1 for the alternative, and 0 for
+world Ww contains only branch-w oracle and value semantics.                      ambiguous, a third outcome distinct from both error and
+   Pair eligibility is outcome-blind. It may depend on the                       success. In the primary Put Back audit, the oracle normalizes
+generator, task legality, successful memory update, exact                        each target’s signed block progress over the executed chunk
+restoration, and current-state equality, but never on action                     by the inter-target separation and selects a branch only when
+sensitivity, decision direction, physical value, or task success.                one progress exceeds the other by the preregistered margin
+A failed equality check excludes the pair, and excluded                          δ = 0.05. Other cohorts use their registered normalization
+pairs are never replaced after the action has been observed.                     and margin. Signed faithfulness scores each memory only in
+Indexing eligible pair clusters by p and registered action-seed                  the world it matches,
+repeats by r, the two queries of a pair share common action
+                                                                                              F = Ep,r 12 [Y0 (Ap0r ) + Y1 (Ap1r )] .                              (3)
+randomness through the scalar seed ξr , which fixes the
+policy’s internal draw for repeat r. The frozen policy π                         We additionally report the raw correct-choice rate pcorrect
+maps one current packet and one memory state to an action                        and the ambiguity rate pambiguous , the fractions of matched-
+chunk, and is queried once per memory:                                           world decisions that the oracle scores +1 and 0, pooled
+                                                                                 over both crossing directions, pairs, and seeds. Because F =
+         Apmr = π(Xt,p , Mpm ; ξr ) ,                m ∈ {0, 1},          (1)    2pcorrect + pambiguous − 1, F is a compact signed summary
+where Xt,p is the shared current packet of pair p at its audited                 rather than an additional source of information beyond the
+present and Mpm is the memory produced by history Hpm .                          underlying outcome rates.
+   Each action is saved before any evaluator-world selection                        To quantify continuous physical benefit, let Vw (A) denote
+and then evaluated in both W0 and W1 , which change only                         the preregistered scalar normalized value of action chunk A
+the oracle and value functional. Evaluator labels enter neither                  in evaluator world Ww , so that Ww = (Yw , Vw ) is the pair
+the policy query nor pair eligibility. The resulting crossing                    of branch-w functionals. We define matched-world value as
+isolates the local role of memory at the audited present; it                     the World × Memory contrast
+does not estimate how frequently such perceptual aliasing                        U = Ep,r 12 [V0 (Ap0r ) − V0 (Ap1r ) + V1 (Ap1r ) − V1 (Ap0r )].
+occurs in natural episodes.                                                                                                                     (4)
+                                                                                 The primary measure U1 , whose subscript denotes the
+B. Decision-Level Audit Metrics
+                                                                                 one-chunk readout horizon rather than an evaluator world,
+  Across pairs p and action-seed repeats r, we first measure                     evaluates a single executed policy chunk using raw signed
+whether memory changes the action (i.e., action sensitivity):                    progress toward the congruent target. We additionally report
+                                                                                 absolute regret L = 1 − Ep,r 21 [Ṽ0 (Ap0r ) + Ṽ1 (Ap1r )], where
+                     S = Ep,r d(Ap0r , Ap1r ) ,                           (2)
+                                                                                 Ṽw is the registered monotone map of Vw onto the bounded
+where Ep,r is the empirical average over eligible pair clusters                  scale [0, 1]. Thus, L measures shortfall from the normalized
+and their registered seeds, and d is a preregistered executed-                   reference value 1, not regret relative to the best achievable
+action distance. In the primary audit it is the√RMSE over the                    action. Unlike choice, U1 and L retain graded physical
+executed chunk, d(A, A′ ) = ∥A − A′ ∥F / Kda , and we                            progress within a branch; unlike final task success, they
+evaluate the audited action before subsequent replanning can           Pre-intervention non-memory state is fixed exactly; af-
+alter the outcome.                                                  terward, the native rollout continues, allowing memory-
+   We therefore report direction, seed, and bidirectional           dependent computation to diverge naturally. Cleared-bank and
+results separately. A pair is fully reliable only if both           no-restore conditions are therefore not current-only baselines:
+memory directions select their warranted branches under             native updates continue after intervention, so a cleared bank
+every registered action seed.                                       refills from post-clear observations, including a fresh anchor
+                                                                    for Mem-0. The restoration population is a preassigned stage-
+C. Pair-Level Inference and Controls                                and-delay mixture. An episode whose assigned event is never
+                                                                    reached retains its shared unperturbed outcome.
+   1) Statistical units: The independent unit of a constructed
+audit is the pair cluster; memories, common-seed queries,                                IV. E XPERIMENTS
+evaluator worlds, and replays are repeated observations within
+                                                                       We evaluate CMA through four research questions designed
+the same cluster. The natural-rollout test resamples ordinary
+                                                                    to test progressively stronger claims about memory use:
+episodes within layout strata. Models, tasks, and local-audit
+                                                                       • RQ1: Are task success and action sensitivity sufficient
+cohorts are never pooled into a single effect. Unavailable
+values are reported as missing rather than zeros.                        evidence that memory guides an individual decision?
+                                                                         (Sec. IV-B)
+   2) Irrelevant-history control: We extend each pair to a
+                                                                       • RQ2: Does memory content exert closed-loop influence
+two-by-two design over Semantic × Nuisance histories. Each
+                                                                         beyond the constructed audit, through history replace-
+semantic origin contributes two detour routes, a and b, with
+                                                                         ment and memory restoration? (Sec. IV-C)
+different valid motions, equal native update counts, and the
+                                                                       • RQ3: Does CMA behave as intended under known-
+same restored final current. A semantic memory effect must
+                                                                         answer calibration and irrelevant-history controls, and
+satisfy the preregistered positive rule on both routes. Nuisance
+                                                                         does the audited decision structure occur in untreated
+effects on choice and value, together with the Semantic × Nui-
+                                                                         natural rollouts? (Sec. IV-D)
+sance interaction, are assessed by equivalence: the entire 90%
+                                                                       • RQ4: Does the distinction between action change and
+pair-bootstrap interval must lie within its preregistered margin.
+                                                                         memory-guided choice persist on physical hardware?
+Merely failing to reject a difference is therefore insufficient.
+                                                                         (Sec. IV-E)
+D. Native-Rollout Memory Interventions                              A. Experiment Setup
+   The same separation principle extends to states reached             Subjects. We audit the official Mem-0 m1 mix [9] on Put
+during native rollouts through two intervention classes. A          Back, Rearrange, and Swap, and the official BridgeVLA++ [6]
+native-event history intervention enrolls an ordinary rollout       on Put Back. The two policies are analyzed separately and
+when a frozen, outcome-blind event rule fires. It fixes the         never pooled. All simulated evaluations use frozen check-
+enrolled recipient’s current input and non-memory state, then       points, with no training, fine-tuning, or weight updates. For
+replaces only the declared history carrier: the explicit bank,      the physical deployment (Sec. IV-E), task-specific Mem-0 ex-
+counters, and stream for Mem-0, or a lawfully regenerated           ecution modules are retrained for the dual-arm PiPER embod-
+history tape for BridgeVLA++. Replacement content is drawn          iment and frozen before auditing. This is embodiment adapta-
+either from the recipient’s own history or from a donor             tion rather than zero-shot transfer of the simulated checkpoint.
+episode. Measured splice residuals bound the interpretation            Qualification and cohorts. Both policies first pass a native
+to the declared carrier rather than to an uncontrolled change       qualification gate before entering any audit cohort: Mem-0
+in memory content alone.                                            achieves 20/20, 18/20, and 19/20 on Put Back, Rearrange,
+   A second intervention, matched-prefix restoration, clears        and Swap, respectively, while BridgeVLA++ passes its frozen
+the bank at a native query boundary, allows the policy to           20-episode qualification gate. These episodes are excluded
+execute for a fixed fault period, and restores a declared           from all subsequent analyses. Native-event and restoration
+component at the next query. The remaining intervention             experiments use fresh, disjoint populations enrolled by frozen,
+budget is shared across compared conditions. Its endpoint           outcome-blind rules; episodes that never reach the assigned
+is official full-episode success, which is distinct from the        enrollment event are retained. Table 1 summarizes the cohorts
+one-chunk physical value U1 .                                       and independent units. All confirmatory intervals use 10,000
+   Each intervention class fixes its intervention point and         preregistered bootstrap draws over the reported denominators.
+readout in advance. For native-event interventions, the end-        Record-level cohort inputs and an anonymous recomputation
+point is commitment: a sustained approach toward one target         kit are provided as supplementary artifacts.
+confirmed over the remaining continuation. A transient earlier         Primary audited decision. The main constructed audit uses
+segment toward another target does not overturn this endpoint       the later-Swap decision. In Swap, two visually identical blocks
+and is reported separately from both the first sustained            are moved among three trays through sequential transfers
+direction and official success. We keep two clocks separate:        followed by a final button press. We place the audit after the
+the intervention stage, which specifies the treated boundary,       common grasp-and-lift phase and before empty-tray selection,
+and the readout window, which may be a fixed window, native         when the precommitment motion is complete and the branch
+action chunk, or official endpoint.                                 oracle evaluates the decision. Two task-consistent histories
+                                                                                Table 2. Registered endpoints of the dissociation. Constructed cohorts of
+therefore produce the same verified current input while                         Table 1; preregistered 95% pair-cluster bootstrap intervals. Sexec : executed
+warranting different branches. Official task success requires                   action divergence; F : signed faithfulness (̸= 2pcorrect − 1 under nonzero
+the complete swapped configuration; an individual transfer or                   ambiguity); regret: shortfall from the reference value 1; fully reliable: correct
+                                                                                in both directions under all seeds. Blank: structural values or endpoints
+transiently swapped geometry is not treated as task success.                    without registered intervals.
+Table 1. Selected simulation cohorts and independent units. Directions,            Endpoint           Put Back                  later Swap
+histories, conditions, and seed repeats are within-unit observations; cohorts
+are never pooled. Units are pair clusters unless marked as episodes. M0: Mem-      Sexec              0.054 [0.051, 0.057]      0.059 [0.053, 0.065]
+0; B++: BridgeVLA++ (deterministic queries); PB: Put Back. Calibration             pcorrect           0.729 [0.677, 0.781]      0.5
+and natural-rollout cohorts: Sec. IV-D; physical cohorts: Table 3.                 F                  0.529 [0.422, 0.633]      0
+                                                                                   U1                 0.185 [0.155, 0.215]      −0.019 [−0.031, −0.008]
+    Cohort                          Units        Within each unit                  Absolute regret    0.442                     0.772
+                                                                                   Fully reliable     20/64                     0/24
+    RQ1: Constructed decision audits
+    M0, PB                          64 pairs     2 dir.×3 seeds
+    M0, later Swap                  24 pairs     2 dir.×2 seeds                 vanishes and branch invariance becomes identifiable. Put
+    RQ2: Native-rollout interventions                                           Back failures also cluster spatially: the correct-choice rate at
+    Native event (B++, PB)          24 pairs     2 dir.×1 query
+    Native event (M0, PB)           12 pairs     2 dir.×2 seeds                 target 3 is 0.115, compared with 0.865–0.979 at targets 0–2,
+                                    24 pairs                                    with the same pattern in the held-out population. Because
+    Stage cohort (M0, PB)           (12/stage)   2 directions                   target location is never intervened on, this identifies a target-
+    Staged removal (M0, Swap) 24 episodes        removal + restore
+    Anchor recovery (M0, Swap) 36 episodes       restore + nested seeds         associated failure pattern rather than a geometric cause.
+    RQ3: Irrelevant-history control
+    Nuisance 2×2 (M0, PB)           48 pairs     4 histories×3 seeds            C. When Replacement Redirects and Restoration Recovers
+                                                                                (RQ2)
+                                                                                   RQ1 shows that local action change is insufficient evidence
+B. When Action Change Misleads (RQ1)                                            of memory use. We therefore test whether memory influences
+   To answer RQ1, we first examine the two metrics most                         subsequent closed-loop behavior through native replacement
+commonly used to assess memory use in robot policies: task                      and restoration.
+success and action sensitivity. CMA separates these metrics                        1) History replacement at native events: At a frozen,
+from the stronger question of whether the changed action                        outcome-blind event, we replace the enrolled recipient’s
+selects the branch warranted by the remembered history.                         declared history carrier with either its own history or a donor
+On the same frozen checkpoint, the two metrics dissociate                       episode’s opposite-target history, while keeping the current
+in opposite directions: Put Back is correct on average but                      input and non-memory state fixed. Own-history reconstruction
+unreliable pair by pair, whereas later Swap changes every                       preserves official success in 48/48 BridgeVLA++ and 47/48
+action without changing its branch (Table 2).                                   Mem-0 continuations; the single Mem-0 failure commits
+   Put Back Evaluation. Mem-0 passes native qualification                       correctly but fails physically. In contrast, opposite-target
+(20/20), and all 64 valid audited pairs exhibit an action change                history reduces official success to 0/48 for each policy, while
+across the two memories. Yet action sensitivity does not imply                  all 48 continuations per policy commit to the donor target
+reliable branch selection. The correct-choice rate is 0.729 with                (Fig. 4A). Thus, replacing memory with content encoding the
+signed faithfulness F = 0.529, while only 20/64 pairs are                       opposite task history redirects subsequent behavior toward
+fully reliable across all three registered action seeds. Matched-               that content, even though it specifies the wrong target for the
+world physical value is positive (U1 = 0.185), but absolute                     recipient episode. The policies remain analyzed separately,
+regret is 0.442, showing that even average physical benefit                     with pair clusters as the independent units (Table 1).
+does not imply reliable memory-guided decisions (Fig. 3A,B).                       Content-specificity controls. We next distinguish memory-
+   Later Swap Evaluation. Later Swap provides the comple-                       content effects from the replacement operation itself. In a
+mentary case. Every one of the 24 paired audits changes its                     separate Mem-0 Put Back stage cohort, donor-corresponding
+action, yielding Sexec = 0.059, yet the selected branch never                   first sustained directions are higher under opposite-target re-
+changes (Fig. 3C): pcorrect = 0.5, F = 0, and no pair is fully                  placement than under bank clearing by +0.583 [0.500, 0.708]
+reliable. The policy therefore responds to memory without                       at the early event and +0.667 [0.542, 0.792] at the late event.
+using it to distinguish the warranted branch. Together, the two                 Self-restore controls reproduce saved actions, query schedules,
+tasks demonstrate that task success and action change provide                   and tracked block trajectories exactly (Sec. III-D). These
+different and incomplete evidence: success can conceal local                    controls support content-specific redirection rather than an
+decision failures, while sensitivity can occur without semantic                 effect attributable to perturbation alone.
+use. The dissociation is stable across the analysis grid. For                      Readout Timing. At the frozen early event, all tested
+Put Back, the qualitative ordering is unchanged over all five                   readout windows remain ambiguous, yet all 24 continuations
+audit horizons (5–30 commands) and choice margins from                          under each history condition later commit to its encoded
+0.025 to 0.075; later Swap remains branch-invariant at every                    target. At the later center-grasp event, 21/24 readouts per
+tested margin. Decision phase also matters: early Rearrange                     condition are already content-corresponding (Fig. 4B). Thus,
+and Swap actions are memory-sensitive but fully ambiguous,                      an ambiguous instantaneous readout need not imply memory
+whereas after the common grasp-and-lift phase, ambiguity                        non-use when commitment occurs later. This also explains
+                               A     Same choice, different value                                              B    Pair reliability                 C      Action change, same branch
+                                                                                                         30       mean = 0.458
+                                    at 0.50: 14 positive · 11 nonpositive                                                   20/64 fully
+                     0.30                                                                                       25
+                                                                                                                             reliable                                          same start
+                                                                                                                                                                                        0 · b0
+
+
+
+     Crossed utility U1
+                                                                                                                                20
+                     0.20                                                                                20
+
+                                                                                            Pair count
+                     0.10                                                                                             10                             Illustrative pair:
+                                                                                                         10                 9                        both saved actions                1 · b0
+                                                                                                                                                     select branch b0
+                           0
+                                                              n = 64 pair clusters                                                                       Later Swap aggregate · 24 pair clusters
+              −0.05                                                                                       0
+                                0.50         0.67          0.83               1.00                               0 1/3 2/3         1
+                                       Correct-choice rate pcorrect                                           Bidirectional correctness
+
+
+Fig. 3. Choice, physical value, and pair reliability describe the same saved actions differently. (A) Put Back pairs at the same correct-choice rate
+differ in crossed utility; horizontal jitter is for visibility only. (B) Per-pair bidirectional correctness across the three registered action seeds, over the same 64
+pair clusters. (C) Two saved 31-point paths from one later-Swap pair (magnified from the marked region) illustrate action change without branch change;
+cohort statistics come from the 24 pairs, not this single pair.
+
+    A                     Native-event history intervention                                                                A    Recovery after injected bank faults
+                           BridgeVLA++ (24 pairs)              Mem-0 (12 pairs)
+                                                                                                                                          unperturbed native 26/36             anchor − none
+                          own                 48/48                                  47/48                                                         20/36         20/36         +38.9 pp
+                                                                                                                                                                               [+27.8, +50.0]
+          opposite                                    0/48                           0/48
+                                                                                                                                   6/36                                        15 improved
+         → donor                                      48/48                          48/48                                                                                     1 worsened
+               cleared                                5/48                           11/48                                      no restore         anchor        rebuild
+                               official success 0–1           official success 0–1
+                                                                                                                                 0,1         0,2         1,0        1,2        2,0       2,1
+    B                     Stage and readout window (Mem-0 Put Back)
+                                     native-chunk readout         succeed        commit                                    B    Protected state and measured operation
+            early, own                                             24/24       rec. 24/24                                                     anchor 4096              rebuild tape 0.74–3.69 MB
+                                                                                                                                      bytes
+            early, opp.                                            0/24        donor 24/24                                                 103          online shadow bank 126,976          107
+                                                                                                                                        anchor 27.43 μs             rebuild 426.69 ms
+                  late, own                                        24/24       rec. 24/24                                          seconds
+                                                                                                                                          10−5 s                                           102 s
+                  late, opp.                                       0/24        donor 24/24
+
+                                     recipient           donor target         ambiguous                               Fig. 5. Restoring a 4096-byte protected anchor recovers closed-loop
+                                                                                                                      success lost to injected bank faults. (A) Official Swap success over the
+                                                                                                                      36-episode assigned mixture after the injected whole-bank fault; the dashed
+Fig. 4. Replacing the history bank at native events redirects behavior to                                             line is the unperturbed native reference, and the strip shows the no-restore
+the replaced content. (A) Official success under own-history reconstruction,                                          (gray) versus anchor (blue) contrast per ordered layout (six episodes each).
+opposite-target history, and cleared banks, each policy analyzed separately;                                          (B) Protected state and measured restoration cost on log axes: 4096 bytes is
+the hatched row is the share of opposite-history continuations committing                                             the numeric tensor payload (serialized protection file: 5321 bytes); timings
+to the donor target. Whiskers: 95% cluster intervals; denominators follow                                             cover the restoration operation only. Dots: medians; lines: observed min–max
+Table 1. (B) Native-chunk readout composition (12 fresh Mem-0 Put Back                                                over the 32 primary recoveries. For storage reference, the online shadow
+pairs per stage): every early readout is ambiguous, although commitment                                               bank holds 126,976 bytes.
+later follows the content; bank-cleared success is 5/24 early and 6/24 late.
+                                                                                                                      4096-byte anchor tensor, and full rebuild from the same
+the difference from the constructed exact-current state, where                                                        disturbed prefix. Intervention stages are crossed with 30- and
+BridgeVLA++ is history-sensitive but all 96 outcomes remain                                                           90-command fault delays; 32 of the 36 assigned episodes
+ambiguous (U1 = −0.0026 [−0.0044, −0.0010]): the two                                                                  reach the fixed recovery boundary. Official success is 6/36
+settings probe local decision dependence and subsequent                                                               without restoration, 20/36 with anchor restoration, and 20/36
+closed-loop commitment, respectively.                                                                                 with full rebuild, compared with an unperturbed native
+   2) Memory Restoration Recovers Success: We then test                                                               reference of 26/36 (Fig. 5A). Anchor restoration improves
+whether restoring memory can recover behavior after an                                                                success over no restoration by 38.9 percentage points (15
+explicit memory fault. In 24 fresh Mem-0 Swap episodes,                                                               episodes improved, one worsened; layout-stratified 95%
+clearing the declared bank at a native query boundary reduces                                                         bootstrap [+27.8, +50.0]). It matches full rebuild in this
+success at all three tested stages. Rebuilding the bank from                                                          cohort, although neither restoration condition fully recovers
+the full observed history at the next query recovers all 12                                                           the native success rate.
+native successes lost under removal, with no losses in the                                                               Execution equivalence and cost. Mem-0 stores the anchor
+primary comparison.                                                                                                   alongside a 30-entry recent-observation window. After a bank
+   Anchor-only restoration. We next ask whether the smallest                                                          reset, native updates install a new anchor from post-fault
+protected component tested can provide the same recovery.                                                             observations. By the tested recovery boundary, the recent win-
+The primary confirmation uses an independent 36-episode                                                               dow has therefore been replenished from actual observations,
+cohort comparing no restoration, restoration of the original                                                          so the disturbed and rebuilt banks differ only in the anchor
+                 HISTORY                                             RESTORED SCENE                                              CONTINUATION
+     A Task 1 · Put Back                                                                                    different origin tray, different warranted return
+
+
+
+
+        left-tray prefix to the centre seat                                                                                 return to the left origin tray
+
+
+
+
+                                                     restored: block at the centre seat, side trays empty
+        right-tray prefix to the centre seat                                                                                return to the right origin tray
+     B Task 2 · Repick                                                                                 different lifted object, different warranted selection
+
+
+
+
+        human lifts the orange block                                                                                        selects the orange block
+
+
+
+
+                                                       restored: both blocks back in their origin trays
+        human lifts the green block                                                                                         selects the green block
+
+Fig. 6. The dual-arm physical audit: storyboards of both tasks. Frames from two recorded demonstration runs per task (illustrative; all counts and
+intervals are in Table 3). Colours mark the two histories, stacked outlines stored history, and dashed rings the decision-relevant objects and trays. (A) Put
+Back: the restored scene hides the origin, so the warranted return differs with the history. (B) Repick: the warranted selection differs with the lifted object.
+Equipment asset tags are blurred for double-blind review.
+
+tensor. Anchor restoration and full rebuild produce identical                    Both mirror-detour routes pass the CMA positive rule,
+complete banks, states, actions, and subsequent trajectories                     with pcorrect = 0.753/0.757. All three 90% nuisance
+in the tested comparisons. RMBench’s ablation showed that                        intervals—correct choice, matched-world value, and the
+anchor fusion matters for Swap [9]. Here we test delayed                         Semantic×Nuisance interaction—lie inside their preregistered
+restoration of the smallest protected component examined                         margins (choice ±0.10, value and interaction ±0.05). The
+and measure its storage and restoration cost (Fig. 5B).                          equivalence claim is limited to these two mirror-detour routes.
+                                                                                    3) Natural Occurrence Without Intervention: Finally, we
+D. Calibration and Controls (RQ3)                                                test whether the decision structure audited by CMA occurs in
+   We validate CMA against known semantic regimes, irrele-                       untreated behavior. An outcome-blind detector identifies the
+vant history, and untreated behavior.                                            audited decision type in 86/96 natural episodes, labeling 52
+   1) Known-Answer Calibration: Four known-answer cal-                           as correct, 22 as ambiguous, and 12 as violating. The primary
+ibrator cells, never pooled with Mem-0, return four distin-                      remaining-step contrast is unresolved (−870 [−4562, 2722],
+guishable regimes. In a controlled update/interference task,                     layout-stratified episode bootstrap); the secondary final-
+transparent recurrent and retrieval policies show natural                        success risk difference is −0.550 [−0.720, −0.375] and is
+semantic-negative prevalences of 0.217 [0.127, 0.321] and                        treated as an observational association rather than a causal
+0.100 [0.061, 0.143] while crossed averages remain positive,                     mechanism. The 24 constructed later-Swap pairs could not
+so correct proxies coexist with individual semantic failures.                    be exactly reconstructed in natural rollouts, so constructed
+Ordered-Route certifies the recurrent family (S = 0.441,                         and natural cohorts are never pooled.
+F = 1, U1 = 0.544; retrieval excluded with 2/5 seeds
+qualifying); on the native Put Back evaluator, a branch-aware                     E. The Crossing Runs on Physical Hardware (RQ4)
+local controller chosen on eight engineering pairs gives F = 1                      We reproduce the crossing protocol on a dual-arm PiPER
+[1, 1] with bidirectional correctness one over 48 pairs; and                     platform (Fig. 6) using two task-specific Mem-0 modules [9],
+reusing one genuine action across balanced pseudo-memory                         retrained for the embodiment and frozen before evaluation.
+labels returns the algebraic F = U1 = 0, a consistency check                     Put Back derives the warranted return from the robot’s
+rather than a general false-positive control.                                    own manipulation history, whereas Repick derives the
+   2) Irrelevant-History Control: The irrelevant-history con-                    warranted selection from a completed external event. For
+firmation uses 48 pair clusters with three common seeds.                         each task, eight native history pairs share the current packet,
+Table 3. Physical audit on the dual-arm PiPER cell: core readouts over
+eight pairs / 32 executions per task. Counts use operator-provided labels,                                     R EFERENCES
+not independent blinded annotation; one further execution per task is a
+mixed/other case. Direction is an auxiliary movement readout. Independent        [1] H. Li et al., “ReMem-VLA: Empowering vision-language-action
+units are the eight pair clusters per task; physical repeats and action seeds        model with memory via dual-level recurrent queries,” arXiv preprint
+are within-unit observations.                                                        arXiv:2603.12942, 2026.
+                                                                                 [2] E. Cherepanov et al., “µVLA: On recurrent memory for partially observ-
+            Readout                           Put Back   Repick                      able manipulation in VLA models,” arXiv preprint arXiv:2606.12497,
+            Target correct                    6/32       8/32                        2026.
+            Wrong target                      6/32       6/32                    [3] Q. Hu et al., “Resolving state ambiguity in robot manipulation via
+            No expressed selection            19/32      17/32                       adaptive working memory recoding,” arXiv preprint arXiv:2512.24638,
+            Manipulation completed            9/32       10/32                       2025.
+              thereof at the wrong target     5/9        5/10                    [4] A. Sridhar, J. Pan, S. Sharma, and C. Finn, “Scaling up memory for
+            Full success                      4/32       5/32                        robotic control via experience retrieval,” in Proc. ICLR, 2026.
+            History-consistent direction      16/32      18/32                   [5] M. Torne et al., “MEM: Multi-scale embodied memory for vision
+            Pairs correct in all four exec.   0/8        0/8                         language action models,” arXiv preprint arXiv:2603.03596, 2026.
+                                                                                 [6] P. Li et al., “BridgeVLA++: A data-efficient, generalizable, and
+                                                                                     memory-augmented vision-language-action framework for 3D manipu-
+non-memory state, and two action seeds; saved prefixes                               lation,” arXiv preprint arXiv:2608.05042, 2026.
+are replayed before closing the loop on fresh observations.                      [7] H. Fang et al., “SAM2Act: Integrating visual foundation model
+Controlled resets are applied before each execution.                                 with a memory architecture for robotic manipulation,” arXiv preprint
+                                                                                     arXiv:2501.18564, 2025.
+   Table 3 shows the same decision-level dissociation observed                   [8] E. Cherepanov, N. Kachaev, A. K. Kovalev, and A. I. Panov, “Memory,
+offline: only 6/32 Put Back and 8/32 Repick executions                               benchmark & robots: A benchmark for solving complex tasks with
+select the history-consistent target, while full success is                          reinforcement learning,” arXiv preprint arXiv:2502.10550, 2025.
+                                                                                 [9] T. Chen et al., “RMBench: Memory-dependent robotic manipula-
+4/32 and 5/32, respectively; no pair is correct in all four                          tion benchmark with insights into policy design,” arXiv preprint
+executions. History-consistent direction occurs in 16/32 and                         arXiv:2603.01229, 2026.
+18/32 executions, showing that movement, selection, and                         [10] Y. Dai et al., “RoboMME: Benchmarking and understanding memory
+                                                                                     for robotic generalist policies,” arXiv preprint arXiv:2603.04639, 2026.
+task success can diverge. In matched-seed Put Back swaps,                       [11] H. Lei et al., “RoboMemArena: A comprehensive and challenging
+only 3/16 direction changes follow the swapped origin, while                         robotic memory benchmark,” arXiv preprint arXiv:2605.10921, 2026.
+9/16 show no change and 3/16 move oppositely.                                   [12] L. P. Kaelbling, M. L. Littman, and A. R. Cassandra, “Planning and
+                                                                                     acting in partially observable stochastic domains,” Artificial Intelligence,
+   The hardware study also reveals a practical reproducibility                       vol. 101, no. 1–2, pp. 99–134, 1998.
+gap. Offline recomputation exactly reproduces saved actions,                    [13] A. Ravichander, Y. Belinkov, and E. Hovy, “Probing the probing
+whereas physical repeats with identical prefixes do not                              paradigm: Does probing accuracy entail task relevance?” in Proc.
+                                                                                     EACL, 2021, pp. 3363–3377.
+reproduce their direction categories. Moreover, action-seed
+                                                                                [14] Y. Fang et al., “When vision overrides language: Evaluating and mitigat-
+variation (0.0674 rad joint RMS) is substantially larger than                        ing counterfactual failures in VLAs,” arXiv preprint arXiv:2602.17659,
+the memory-swap difference (0.0076 rad). Thus, the crossing                          2026.
+protocol is reproducible at the policy-query level but remains                  [15] Z. Li et al., “TRACE: Trajectory-routed causal memory for delayed-
+                                                                                     evidence visuomotor imitation,” arXiv preprint arXiv:2606.14551, 2026,
+subject to substantial closed-loop physical variability.                             version 3, last revised 31 August 2026.
+                                                                                [16] Y. Liang et al., “TFP: Temporally conditioned memory-fusion policies
+               V. D ISCUSSION AND C ONCLUSION                                        for visuomotor learning,” arXiv preprint arXiv:2607.08283, 2026.
+                                                                                [17] X. Guo et al., “Chameleon: Control-indexed prospective memory for
+   When does memory guide robot action? Our audit shows                              visuomotor manipulation,” arXiv preprint arXiv:2603.24576, 2026,
+that neither task success nor action change provides a                               version 2.
+sufficient answer. A policy can change every action without                     [18] P. de Haan, D. Jayaraman, and S. Levine, “Causal confusion in imitation
+                                                                                     learning,” in Proc. NeurIPS, vol. 32, 2019.
+changing its task branch, or select the correct branch on                       [19] C. Wen et al., “Fighting copycat agents in behavioral cloning from
+average while failing pair by pair, across directions, or across                     observation histories,” in Proc. NeurIPS, vol. 33, 2020.
+action seeds. The same dissociation appears on hardware                         [20] Y. Gao, J. J. Liu, S. Li, and S. Song, “Gated memory policy: In-context
+under measured resets. Yet memory can exert genuine                                  memorization and adaptation,” arXiv preprint arXiv:2604.18933, 2026.
+                                                                                [21] A. Geiger, H. Lu, T. Icard, and C. Potts, “Causal abstractions of neural
+closed-loop influence: native-event bank replacement redirects                       networks,” in Proc. NeurIPS, vol. 34, 2021.
+commitment toward the replaced content, while restoring a                       [22] F. Zhang and N. Nanda, “Towards best practices of activation patching
+single protected 4096-byte component recovers 38.9 points                            in language models: Metrics and methods,” in Proc. ICLR, 2024.
+                                                                                [23] C.-T. Liao and X. Cao, “Present but not remembered: Auditing how
+of success lost to injected bank faults.                                             frozen VLAs encode, deploy, and steer visual history,” arXiv preprint
+   CMA therefore provides a decision-level complement to                             arXiv:2607.03372, 2026, version 1.
+episode-scored memory evaluation. It makes memory use                           [24] R. Agarwal et al., “Deep reinforcement learning at the edge of the
+                                                                                     statistical precipice,” in Proc. NeurIPS, vol. 34, 2021.
+testable at a fixed present through sensitivity, warranted                      [25] Z. Zeng, F. Ding, H. Yang, and X. Li, “HELM: Harness-enhanced
+choice, matched-world value, and reliability, while explicitly                       long-horizon memory for vision-language-action manipulation,” arXiv
+declaring the intervention state, readout window, and inde-                          preprint arXiv:2604.18791, 2026.
+pendent sampling unit. Its conclusions remain bounded to the                    [26] J. Chen, “AEGIS: A backup reflex for physical AI,” arXiv preprint
+                                                                                     arXiv:2606.06660, 2026.
+audited checkpoints and tasks; two held-out comparisons                         [27] H. Gao et al., “AGM: Achievement-grounded memory for closed-loop
+showed no exclusive predictive gain over strong simple                               agents with frozen VLA policies,” arXiv preprint arXiv:2608.29537,
+baselines. Ultimately, a memory-guided robot must do more                            2026.
+                                                                                [28] Z. Tan et al., “MemAudit: Post-hoc auditing of poisoned agent memory
+than remember or react: it must reliably use its past to choose                      via causal attribution and structural anomaly detection,” arXiv preprint
+the behavior that the present alone cannot determine.                                arXiv:2605.23723, 2026.
+[29] C. Yu et al., “From faulty memories to corrected actions: Dependency-   arXiv:2608.10502, 2026.
+     guided rollback repair for memory-augmented agents,” arXiv preprint
+
