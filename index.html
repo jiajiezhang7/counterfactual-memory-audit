@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CMA: Memory That Changes Action Is Not Memory That Guides It</title>
+  <meta name="description" content="Counterfactual Memory Audit (CMA) tests whether history-conditioned robot policies use memory to choose the action the past warrants. ICRA 2027 submission.">
+  <meta name="author" content="Jiajie Zhang, Yankai Xiang, Changhao Chen">
+  <link rel="canonical" href="https://jiajiezhang7.github.io/counterfactual-memory-audit/">
+  <meta property="og:title" content="Memory That Changes Action Is Not Memory That Guides It: Counterfactual Auditing of History-Conditioned Robot Policies">
+  <meta property="og:description" content="Counterfactual Memory Audit (CMA). History-conditioned policies can change actions under memory interventions without reliably using memory to choose the action the past warrants.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://jiajiezhang7.github.io/counterfactual-memory-audit/">
+  <meta property="og:image" content="https://jiajiezhang7.github.io/counterfactual-memory-audit/static/images/fig1_cma_design.png">
+  <link rel="icon" href="./static/images/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Castoro:ital@0;1&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+</head>
+<body id="top">
+
+<nav class="navbar cma-nav" role="navigation" aria-label="Main">
+  <div class="navbar-brand">
+    <a class="navbar-item cma-brand" href="#top">CMA</a>
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div id="navMenu" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="https://jiajiezhang7.github.io/">
+        <span class="icon"><i class="fas fa-home"></i></span>
+        <span>Home</span>
+      </a>
+      <a class="navbar-item" href="#abstract">Abstract</a>
+      <a class="navbar-item" href="#video">Video</a>
+      <a class="navbar-item" href="#method">Method</a>
+      <a class="navbar-item" href="#experiments">Experiments</a>
+      <a class="navbar-item" href="#findings">Findings</a>
+      <a class="navbar-item" href="#bibtex">BibTeX</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-body">
+    <div class="cma-wrap">
+      <div class="has-text-centered">
+        <p class="cma-kicker">Counterfactual Memory Audit · ICRA 2027 submission</p>
+        <h1 class="title publication-title">
+          Memory That Changes Action Is Not Memory That Guides It<span class="title-colon">:</span>
+          <span class="title-rest">Counterfactual Auditing of History-Conditioned Robot Policies</span>
+        </h1>
+
+        <div class="is-size-5 publication-authors">
+          <span class="author-block">
+            <a href="https://jiajiezhang7.github.io/">Jiajie Zhang</a><sup>1,&dagger;</sup>
+            <a class="author-email" href="mailto:jiajiezhang@hkust-gz.edu.cn">jiajiezhang@hkust-gz.edu.cn</a>
+          </span>
+          <span class="author-block">
+            Yankai Xiang<sup>2,&dagger;</sup>
+            <a class="author-email" href="mailto:xiangyk2025@shanghaitech.edu.cn">xiangyk2025@shanghaitech.edu.cn</a>
+          </span>
+          <span class="author-block">
+            Changhao Chen<sup>1,*</sup>
+            <a class="author-email" href="mailto:changhaochen@hkust-gz.edu.cn">changhaochen@hkust-gz.edu.cn</a>
+          </span>
+        </div>
+
+        <div class="publication-authors">
+          <p class="affiliation-line">
+            <span class="author-block"><sup>1</sup>Hong Kong University of Science and Technology (Guangzhou)</span>
+            <span class="author-block"><sup>2</sup>ShanghaiTech University</span>
+          </p>
+          <p class="contrib-note"><sup>&dagger;</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>*</sup>Corresponding author</p>
+        </div>
+
+        <p class="claim">History-conditioned policies can change actions under memory interventions without reliably using memory to choose the action the past warrants.</p>
+
+        <div class="publication-links">
+          <span class="link-block">
+            <a class="button is-normal is-rounded is-dark" href="./static/pdf/CMA_Arxiv.pdf">
+              <span class="icon"><i class="fas fa-file-pdf"></i></span>
+              <span>Paper PDF</span>
+            </a>
+          </span>
+          <span class="link-block">
+            <a class="button is-normal is-rounded is-dark" href="#video">
+              <span class="icon"><i class="fas fa-video"></i></span>
+              <span>Video</span>
+            </a>
+          </span>
+          <span class="link-block">
+            <button class="button is-normal is-rounded is-placeholder" type="button" disabled title="Code is not public yet">
+              <span class="icon"><i class="fab fa-github"></i></span>
+              <span>Code (coming soon)</span>
+            </button>
+          </span>
+          <span class="link-block">
+            <button class="button is-normal is-rounded is-placeholder" type="button" disabled title="No public arXiv identifier yet">
+              <span>arXiv (coming soon)</span>
+            </button>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero teaser">
+  <div class="cma-wrap">
+    <div class="hero-body">
+      <img src="./static/images/fig1_cma_design.png" alt="CMA design. Two lawful histories update native memories. One frozen policy is queried on a shared present. Saved actions are scored in evaluator-only worlds.">
+      <p class="teaser-caption has-text-centered">Two lawful pasts, one identical present: each history updates a native memory before the frozen policy is queried.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cma-section" id="abstract">
+  <div class="cma-wrap">
+    <h2 class="title cma-h2 has-text-centered">Abstract</h2>
+    <div class="abstract">
+      <p>A robot returning a block to its origin tray may encounter two task-consistent pasts that reconverge to the same current input but warrant different actions. Yet memory-policy evaluations often rely on task success or action change under memory perturbation, neither of which establishes that memory guides the decision.</p>
+      <p>We propose the Counterfactual Memory Audit (CMA), an evaluation protocol that crosses two histories at a verified-identical present, queries a frozen policy under common randomness, and evaluates each saved action under both pasts. This separates memory sensitivity, warranted choice, matched-world physical value, and per-pair reliability.</p>
+      <p>On Mem-0, every audited Put Back pair changes action, but only 20/64 pairs are fully reliable; at a later Swap decision, all paired actions change while both memories select the same branch.</p>
+      <p>Native interventions further show closed-loop influence: replacing the history bank redirects behavior toward the replaced content, while restoring a 4096-byte protected anchor recovers 38.9 points of Swap success lost to injected bank faults. On a dual-arm physical platform, memory changes saved actions, yet five of nine completed Put Back manipulations reach the wrong target.</p>
+      <p>These results show that a robot can remember and react without reliably using memory to choose the behavior its past warrants. CMA provides a decision-level audit for distinguishing these cases.</p>
+    </div>
+
+    <div id="video">
+      <h2 class="title cma-h2 has-text-centered">Video</h2>
+      <p class="cma-lead" style="margin-left:auto;margin-right:auto;text-align:center;">Full submission video. Playback stays in the browser and does not start on its own.</p>
+      <div class="cma-player" style="margin-top:1.25rem;">
+        <video id="submission-video" controls playsinline preload="metadata" poster="./static/images/poster_submission.jpg" width="1280" height="720" aria-label="CMA submission video">
+          <source src="./static/videos/cma_submission_v6.mp4" type="video/mp4">
+          <a href="./static/videos/cma_submission_v6.mp4">Download the submission video</a>
+        </video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cma-section" id="method" style="background:#fffcf8;border-top:1px solid rgba(28,25,23,0.1);border-bottom:1px solid rgba(28,25,23,0.1);">
+  <div class="cma-wrap">
+    <h2 class="title cma-h2">Method</h2>
+    <p>CMA holds fixed everything the policy can see and changes only what it remembers. Two task-consistent histories, generated by the task’s own motion primitives, warrant different branches. Each history updates its native memory. Both then reconverge to one current packet whose non-memory inputs have been verified identical.</p>
+    <p>A frozen policy is queried once per memory under a shared random seed. The two saved actions are scored in both evaluator-only worlds. Those worlds supply the branch oracle and the value functional. They never enter the policy, and they are not used to decide which pairs are eligible.</p>
+    <p>The subjects are frozen checkpoints of Mem-0 (RMBench) and BridgeVLA++, analyzed separately. The same crossing is later run on a dual-arm physical platform.</p>
+
+    <ol class="audit-steps">
+      <li>
+        <span class="step-index">01</span>
+        <strong>Sensitivity</strong>
+        <p>Does changing memory change the action?</p>
+      </li>
+      <li>
+        <span class="step-index">02</span>
+        <strong>Choice</strong>
+        <p>Does the change favor the branch encoded by the memory?</p>
+      </li>
+      <li>
+        <span class="step-index">03</span>
+        <strong>Matched-world value</strong>
+        <p>When memory matches the world, does the selected action improve continuous physical value?</p>
+      </li>
+      <li>
+        <span class="step-index">04</span>
+        <strong>Reliability</strong>
+        <p>Does the effect hold in both directions and under every registered action seed?</p>
+      </li>
+    </ol>
+
+    <div class="cma-player">
+      <video id="method-video" controls playsinline preload="metadata" width="1920" height="1080" aria-label="CMA method clip">
+        <source src="./static/videos/01_method.mp4" type="video/mp4">
+        <a href="./static/videos/01_method.mp4">Download the method clip</a>
+      </video>
+    </div>
+    <p class="video-note">Method clip. The saved actions are scored only after they leave the policy.</p>
+
+    <div class="method-block">
+      <h3>The crossing</h3>
+      <p>Panel A builds two lawful histories and their native memories. Panel B queries one frozen policy once per memory on the shared present. Panel C scores the saved actions only after they cross into evaluator worlds.</p>
+      <figure class="figure-block">
+        <a href="./static/images/fig1_cma_design.png">
+          <img src="./static/images/fig1_cma_design.png" alt="Figure 1. Lawful histories update native memories, one policy is queried twice on the same present, and four evaluator scores stay outside the policy." loading="lazy">
+        </a>
+        <figcaption>Figure 1. Two lawful histories, one verified present, and an evaluator-only crossing. The warranted branch is not in the current observation.</figcaption>
+      </figure>
+    </div>
+
+    <div class="method-block">
+      <h3>Same actions, different verdicts</h3>
+      <p>Sensitivity, choice, physical value, and pair reliability need not agree. On Mem-0 Put Back, every audited pair changes action, but only 20/64 pairs are fully reliable. At a later Swap decision, all paired actions change while both memories select the same branch.</p>
+      <figure class="figure-block">
+        <a href="./static/images/fig2_incremental_value.png">
+          <img src="./static/images/fig2_incremental_value.png" alt="Figure 2. Put Back pairs at the same correct-choice rate differ in crossed utility. Twenty of 64 pairs are fully reliable. A later Swap pair changes action without changing branch." loading="lazy">
+        </a>
+        <figcaption>Figure 2. Choice, crossed utility, and pair reliability on the same saved actions. The Swap panel is one illustrative pair; the branch result is the cohort’s.</figcaption>
+      </figure>
+    </div>
+
+    <div class="method-block">
+      <h3>Natural rollouts and nuisance routes</h3>
+      <p>An outcome-blind detector asks whether the audited decision structure appears in untreated episodes. A separate control crosses semantic origin with two detour routes that restore the same current. Nuisance effects are judged by equivalence to preregistered margins, not by a failure to find a difference.</p>
+      <figure class="figure-block">
+        <a href="./static/images/fig3_natural_bridge.png">
+          <img src="./static/images/fig3_natural_bridge.png" alt="Figure 3. Natural-rollout gate and observational downstream contrasts. The primary remaining-step contrast is marked unresolved." loading="lazy">
+        </a>
+        <figcaption>Figure 3. Untreated natural rollouts. Reached episodes are labeled correct, ambiguous, or violating. The primary remaining-step contrast is unresolved; the final-success contrast is observational.</figcaption>
+      </figure>
+      <figure class="figure-block">
+        <a href="./static/images/fig4_nuisance_equivalence.png">
+          <img src="./static/images/fig4_nuisance_equivalence.png" alt="Figure 4. Semantic origins crossed with two nuisance detours, and equivalence intervals inside frozen margins." loading="lazy">
+        </a>
+        <figcaption>Figure 4. Irrelevant-history control. Each semantic origin is paired with two detours that share the restored current. The equivalence claim is limited to those routes.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="cma-section" id="experiments">
+  <div class="cma-wrap">
+    <h2 class="title cma-h2">Real robot</h2>
+    <p class="cma-lead">The crossing is reproduced on a dual-arm PiPER platform with task-specific Mem-0 modules, retrained for the embodiment and frozen before the audit. Put Back takes the warranted return from the robot’s own manipulation history. Repick takes the warranted selection from a completed external event. Resets are measured before each execution. Memory changes the saved actions, yet five of nine completed Put Back manipulations reach the wrong target.</p>
+    <p>The clips are annotated excerpts. A shown pair illustrates the audit; it does not stand in for every trial.</p>
+
+    <div class="switcher" role="tablist" aria-label="Annotated clips">
+      <button type="button" class="is-active" role="tab" aria-selected="true" id="tab-opening"
+              data-clip="./static/videos/00_opening.mp4"
+              data-caption="A completed manipulation can still choose the wrong target. Put Back, remembered origin on the right.">
+        <span class="switch-label">Opening</span><span class="switch-time">0:08</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" id="tab-putback"
+              data-clip="./static/videos/02_task1_main.mp4"
+              data-caption="Task 1, Put Back. Two recorded histories change the warranted return, and the queries share one current input. In this illustrative pair both manipulations finish in the left tray. Completing the manipulation does not establish the warranted choice.">
+        <span class="switch-label">Put Back</span><span class="switch-time">0:48</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" id="tab-repick"
+              data-clip="./static/videos/03_task2.mp4"
+              data-caption="Task 2, Repick. The warranted selection is the object that was lifted and put back. Once the objects are restored to their trays, the current scene no longer shows which history occurred.">
+        <span class="switch-label">Repick</span><span class="switch-time">0:22</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" id="tab-repeat"
+              data-clip="./static/videos/06_AA_repeat.mp4"
+              data-caption="Same saved action prefix, different physical continuation. One Put Back execution and its physical repeat: the first five sent commands match, and later closed-loop actions can diverge.">
+        <span class="switch-label">Physical repeat</span><span class="switch-time">0:20</span>
+      </button>
+      <button type="button" role="tab" aria-selected="false" id="tab-summary"
+              data-clip="./static/videos/04_summary.mp4"
+              data-caption="Sensitivity asks whether a memory change moves the action. Reliable memory-guided choice asks whether every tested history and seed selects the branch that past warrants.">
+        <span class="switch-label">Summary</span><span class="switch-time">0:17</span>
+      </button>
+    </div>
+
+    <div class="cma-player">
+      <video id="clip-player" controls playsinline preload="metadata" width="1920" height="1080" src="./static/videos/00_opening.mp4" aria-label="Annotated real-robot clip">
+        <a href="./static/videos/00_opening.mp4">Download the opening clip</a>
+      </video>
+    </div>
+    <p id="clip-caption" class="clip-caption" aria-live="polite">A completed manipulation can still choose the wrong target. Put Back, remembered origin on the right.</p>
+
+    <noscript>
+      <p>Clip switcher needs JavaScript. Direct files:</p>
+      <ul>
+        <li><a href="./static/videos/00_opening.mp4">Opening</a></li>
+        <li><a href="./static/videos/02_task1_main.mp4">Put Back</a></li>
+        <li><a href="./static/videos/03_task2.mp4">Repick</a></li>
+        <li><a href="./static/videos/06_AA_repeat.mp4">Physical repeat</a></li>
+        <li><a href="./static/videos/04_summary.mp4">Summary</a></li>
+      </ul>
+    </noscript>
+
+    <div class="still-grid">
+      <figure>
+        <img src="./static/images/PutBack.jpg" alt="Overhead view of the dual-arm cell at a Put Back decision. A blue block sits at the center seat and the side trays are empty." loading="lazy">
+        <figcaption>Put Back. The restored scene hides the origin tray, so the warranted return depends on the manipulation history.</figcaption>
+      </figure>
+      <figure>
+        <img src="./static/images/Repick.jpg" alt="Dual-arm cell during Repick. A person holds an orange block above the trays." loading="lazy">
+        <figcaption>Repick. An external lift determines which object should be selected after both objects are back in their trays.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="cma-section" id="findings">
+  <div class="cma-wrap">
+    <h2 class="title cma-h2">Key findings</h2>
+    <p class="cma-lead">Episode success and action change are not the same claim as memory-guided choice.</p>
+    <div class="finding-grid">
+      <article class="finding-card">
+        <p class="finding-kicker">Mem-0 · Put Back</p>
+        <p>Every audited pair changes action, but only 20/64 pairs are fully reliable.</p>
+      </article>
+      <article class="finding-card">
+        <p class="finding-kicker">Later Swap</p>
+        <p>All paired actions change while both memories select the same branch.</p>
+      </article>
+      <article class="finding-card">
+        <p class="finding-kicker">Native intervention</p>
+        <p>Replacing the history bank redirects behavior. Restoring a 4096-byte protected anchor recovers 38.9 points of Swap success lost to injected bank faults.</p>
+      </article>
+      <article class="finding-card">
+        <p class="finding-kicker">Dual-arm physical</p>
+        <p>Memory changes saved actions, yet five of nine completed Put Back manipulations reach the wrong target.</p>
+      </article>
+    </div>
+    <p class="subjects-note">Audited subjects: Mem-0 (RMBench) and BridgeVLA++.</p>
+  </div>
+</section>
+
+<section class="cma-section" id="bibtex">
+  <div class="cma-wrap">
+    <div class="bibtex-head">
+      <h2 class="title cma-h2" style="margin-bottom:0;">BibTeX</h2>
+      <button class="button is-small is-rounded is-dark" type="button" id="copy-bibtex">Copy</button>
+    </div>
+    <div class="bibtex-wrap">
+      <pre><code id="bibtex">@misc{zhang2026cma,
+  title={Memory That Changes Action Is Not Memory That Guides It: Counterfactual Auditing of History-Conditioned Robot Policies},
+  author={Jiajie Zhang and Yankai Xiang and Changhao Chen},
+  year={2026},
+  note={ICRA 2027 submission},
+  url={https://jiajiezhang7.github.io/counterfactual-memory-audit/}
+}</code></pre>
+    </div>
+    <p class="bibtex-note">Provisional entry. No arXiv identifier is available for this submission yet.</p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="https://jiajiezhang7.github.io/" aria-label="Jiajie Zhang homepage">
+        <i class="fas fa-home"></i>
+      </a>
+    </div>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>This website is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.</p>
+          <p>The layout is adapted from the <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project-page template. You are free to borrow the source; please link back to that template.</p>
+          <p><a href="https://jiajiezhang7.github.io/">Jiajie Zhang</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var burger = document.querySelector(".navbar-burger");
+  var menu = document.getElementById("navMenu");
+  if (burger && menu) {
+    burger.addEventListener("click", function () {
+      var open = burger.classList.toggle("is-active");
+      menu.classList.toggle("is-active", open);
+      burger.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    menu.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", function () {
+        burger.classList.remove("is-active");
+        menu.classList.remove("is-active");
+        burger.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  var videos = Array.prototype.slice.call(document.querySelectorAll("video"));
+  videos.forEach(function (video) {
+    video.addEventListener("play", function () {
+      videos.forEach(function (other) {
+        if (other !== video) other.pause();
+      });
+    });
+  });
+
+  var player = document.getElementById("clip-player");
+  var caption = document.getElementById("clip-caption");
+  var tabs = Array.prototype.slice.call(document.querySelectorAll("[data-clip]"));
+
+  function startPlayback(video) {
+    var pending = video.play();
+    if (pending && pending.catch) pending.catch(function () {});
+  }
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      var src = tab.getAttribute("data-clip");
+      tabs.forEach(function (other) {
+        var on = other === tab;
+        other.classList.toggle("is-active", on);
+        other.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      if (caption) caption.textContent = tab.getAttribute("data-caption") || "";
+      if (!player) return;
+      if (player.getAttribute("src") !== src) {
+        player.pause();
+        player.setAttribute("src", src);
+        player.load();
+      }
+      startPlayback(player);
+    });
+  });
+
+  var copyButton = document.getElementById("copy-bibtex");
+  var bibtex = document.getElementById("bibtex");
+  if (copyButton && bibtex) {
+    copyButton.addEventListener("click", function () {
+      var text = bibtex.textContent.replace(/^\n/, "").replace(/\n$/, "");
+      var done = function () {
+        copyButton.textContent = "Copied";
+        window.setTimeout(function () { copyButton.textContent = "Copy"; }, 1600);
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {});
+        return;
+      }
+      var area = document.createElement("textarea");
+      area.value = text;
+      area.setAttribute("readonly", "");
+      area.style.position = "fixed";
+      area.style.left = "-9999px";
+      document.body.appendChild(area);
+      area.select();
+      try {
+        if (document.execCommand("copy")) done();
+      } catch (err) {}
+      document.body.removeChild(area);
+    });
+  }
+})();
+</script>
+</body>
+</html>
